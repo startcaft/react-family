@@ -33,13 +33,28 @@ export const fetchWeatherFailure = (error) => {
     }
 }
 
+/**
+ * 给每个访问 API 的请求做序列编号
+ */
+let nextSeqId = 0;
+
 const appCode = '30e37351cadf480494cde3aa049f6ba6';
 export const fetchWeatherAsync = (cityCode) => {
     return (dispatch,getState) => {
         const apiUrl = `http://jisutqybmf.market.alicloudapi.com/weather/query?citycode=${cityCode}`;
 
+        /**
+         * 检查当前环境的 seqId 和 全局的 nextSeqId 是否相同
+         */
+        const seqId = ++ nextSeqId;
+        const dispatchVliad = (action) => {
+            if(seqId === nextSeqId){
+                return dispatch(action);
+            }
+        }
+
         // 派发一个 异步请求开始的action
-        dispatch(fetchWeatherStarted());
+        dispatchVliad(fetchWeatherStarted());
 
         fetch(apiUrl,{
             method:'get',
@@ -53,10 +68,10 @@ export const fetchWeatherAsync = (cityCode) => {
 
             response.json().then((responseJson) => {
                 // 派发一个 异步请求成功的action
-                dispatch(fetchWeatherSuccess(responseJson.result));
+                dispatchVliad(fetchWeatherSuccess(responseJson.result));
             }).catch((error) => {
                 // 派发一个 异步请求失败的action
-                dispatch(fetchWeatherFailure(error));
+                dispatchVliad(fetchWeatherFailure(error));
             });
         }).catch((error) => {
             // 派发一个 异步请求失败的action
