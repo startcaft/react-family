@@ -29,7 +29,7 @@ const Weather = ({status, cityName, weatherInfo, lowestTemp, highestTemp}) => {
 Weather.propTypes = {
     status: PropTypes.string.isRequired,
     city: PropTypes.string,
-    weather: PropTypes.string,
+    weatherInfo: PropTypes.string,
     templow: PropTypes.string,
     temphigh: PropTypes.string
 };
@@ -40,7 +40,7 @@ const mapStateTopProps = (state) => {
   return {
     status: weatherData.status,
     cityName: weatherData.city,
-    weather: weatherData.weather,
+    weatherInfo: weatherData.weather,
     lowestTemp: weatherData.templow,
     highestTemp: weatherData.temphigh
   };
