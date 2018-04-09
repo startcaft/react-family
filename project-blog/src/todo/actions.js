@@ -1,7 +1,22 @@
 // 定义 todo 模块中所有 action 的构造函数
 
-import { ADD_TODO,SEARCH } from './actionTypes';
+import { ADD_TODO,SEARCH,CHANGE_TODO_TO_DOING,
+    DELETE_TODO
+} 
+from './actionTypes';
 
+
+/**
+ * 将 新建备忘录 转换成 正在进行中的备忘录，
+ * @param {*} index 备忘录数据数组下标
+ */
+export function changeTodoToDoing(index) {
+    return {
+        type: CHANGE_TODO_TO_DOING,
+        index,
+    };
+}    
+    
 /**
  * ADD_TODO action 异步构造函数
  * @param {*} text 备忘录具体内容
@@ -35,5 +50,16 @@ export function search(text) {
     return {
         type: SEARCH,
         text,
+    };
+}
+
+/**
+ * 删除指定下标的备忘录
+ * @param {*} index 下标
+ */
+export function deleteTodo(index) {
+    return {
+        type: DELETE_TODO,
+        index,
     };
 }

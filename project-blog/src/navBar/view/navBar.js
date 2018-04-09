@@ -1,8 +1,6 @@
 import { Row, Col } from 'antd';
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
-import NavLink from './typeLink';
-
+import TypeLink from './typeLink';
 
 class NavBar extends Component {
     render(){
@@ -10,31 +8,30 @@ class NavBar extends Component {
             <div className="navigation">
                 <Row className="className" type="flex" align="middle" justify="space-around">
                     <Col span={6}>
-                        <NavLink to="/">
+                        <TypeLink to="/">
                             全部&nbsp;
                             <span>{this.props.allMemos}</span>
-                        </NavLink>
+                        </TypeLink>
                     </Col>
                     <Col span={6}>
-                        <NavLink to="/todo">
+                        <TypeLink to="/todo">
                             新建事项&nbsp;
                             <span>{this.props.todoNumber}</span>
-                        </NavLink>
+                        </TypeLink>
                     </Col>
                     <Col span={6}>
-                        <NavLink to="/doing">
+                        <TypeLink to="/doing">
                             正在进行&nbsp;
                             <span>{this.props.doingNumber}</span>
-                        </NavLink>
+                        </TypeLink>
                     </Col>
                     <Col span={6}>
-                        <NavLink to="/done">
+                        <TypeLink to="/done">
                             已完成&nbsp;
                             <span>{this.props.doneNumber}</span>
-                        </NavLink>
+                        </TypeLink>
                     </Col>
                 </Row>
-                {/* <Route exact={true} path="/" Component={}/> */}
             </div>
         )
     }
