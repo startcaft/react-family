@@ -12,7 +12,3 @@ export const DOING = 'doing';
  * 已完成类型
  */
 export const DONE = 'done';
-/**
- * 全部类型
- */
-export const ALL = 'all'

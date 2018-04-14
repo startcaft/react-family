@@ -14,9 +14,25 @@ export const SEARCH = 'Search';
  * 将 新建状态 转换成 正在进行状态 的 action 定义
  */
 export const CHANGE_TODO_TO_DOING = 'Change_Todo_To_Doing';
-export const CHANGE_DOING_TO_DONE = 'Change_Doing_To_Done';
+
+/**
+ * 将 完成状态 转换成 正在进行状态 的 action 定义
+ * @type {string}
+ */
 export const CHANGE_DONE_TO_DOING = 'Change_Done_To_Doing';
+
+/**
+ * 将 doing 状态改为 done 的 action 定义
+ * @type {string}
+ */
+export const CHANGE_DOING_TO_DONE = 'Change_Doing_To_Done';
+
+/**
+ * 将 doing 状态改为 todo 的 action 定义
+ * @type {string}
+ */
 export const CHANGE_DOING_TO_TODO = 'Change_Doing_To_Todo';
+
 
 /**
  * 删除 备忘录的 action 定义

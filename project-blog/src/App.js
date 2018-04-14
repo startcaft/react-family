@@ -7,6 +7,11 @@ import { view as NavBar } from './navBar/index';
 import { actions as todoActions } from './todo/index';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { BrowserRouter as Router,Route,Switch } from 'react-router-dom';
+import AllMemos from './typeTodoList/view/allMemos';
+import TodoList from './typeTodoList/view/todoList';
+import DoingList from './typeTodoList/view/doingList';
+import DoneList from './typeTodoList/view/doneList';
 
 class App extends Component {
   constructor(props) {
@@ -29,20 +34,27 @@ class App extends Component {
         }
     });
     return (
-      <div>
-        <HeaderView
-          onAdd={(text) => addNewTodo(text)}
-          onSearch={text => searchTodo(text)}
-          todolist={todos}
-        />
-        <NavBar
-          allMemos={allMemos}
-          todoNumber={todoNumber}
-          doingNumber={doingNumber}
-          doneNumber={doneNumber}
-        />
-        {this.props.children}
-      </div>
+        <Router>
+          <div>
+            <HeaderView
+                onAdd={(text) => addNewTodo(text)}
+                onSearch={text => searchTodo(text)}
+                todolist={todos}
+            />
+            <NavBar
+                allMemos={allMemos}
+                todoNumber={todoNumber}
+                doingNumber={doingNumber}
+                doneNumber={doneNumber}
+            />
+            <Switch>
+                <Route exact path="/" component={AllMemos} />
+                <Route path="/todo" component={TodoList} />
+                <Route path="/doing" component={DoingList} />
+                <Route path="/done" component={DoneList} />
+            </Switch>
+          </div>
+        </Router>
     );
   }
 }

@@ -1,7 +1,8 @@
 // 定义 todo 模块中所有 action 的构造函数
 
 import { ADD_TODO,SEARCH,CHANGE_TODO_TO_DOING,
-    DELETE_TODO
+    CHANGE_DONE_TO_DOING,DELETE_TODO,
+    CHANGE_DOING_TO_DONE,CHANGE_DOING_TO_TODO
 } 
 from './actionTypes';
 
@@ -15,7 +16,43 @@ export function changeTodoToDoing(index) {
         type: CHANGE_TODO_TO_DOING,
         index,
     };
-}    
+}
+
+/**
+ * 状态由done转为doing
+ * @param index 需要改变状态的事项的下标
+ * @returns {{type: string, index: *}}
+ */
+export function changeDoneToDoing(index) {
+    return {
+        type: CHANGE_DONE_TO_DOING,
+        index,
+    };
+}
+
+/**
+ * 状态由doing转为todo
+ * @param index 需要改变状态的事项的下标
+ * @returns {{type: *, index: *}}
+ */
+export function changeDoingToTodo(index) {
+    return {
+        type: CHANGE_DOING_TO_TODO,
+        index,
+    };
+}
+
+/**
+ * 将状态由 doing 转为 done
+ * @param index 需要改变状态的事项的下标
+ * @returns {{type: *, index: *}}
+ */
+export function changeDoingToDone(index) {
+    return {
+        type: CHANGE_DOING_TO_DONE,
+        index,
+    };
+}
     
 /**
  * ADD_TODO action 异步构造函数
