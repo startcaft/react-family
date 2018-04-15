@@ -25,23 +25,6 @@ class AllMemosRoute extends Component {
                 <List title={"新建事项"}  items={todos} onDel={this.props.deleteTodo}/>
                 <List title={"正在进行"}  items={doings} opacity={0.7} onDel={this.props.deleteTodo}/>
                 <List title={"已完成"} items={dones} opacity={0.4} onDel={this.props.deleteTodo}/>
-                {/*<ListTodoMemos */}
-                    {/*todos = {todos}*/}
-                    {/*onDel={index => dispatch(actions.deleteTodo(index))}*/}
-                    {/*onTodoToDoing={index => dispatch(actions.changeTodoToDoing(index))}*/}
-                {/*/>*/}
-                {/*<ListDoingMemos*/}
-                    {/*todolist={todos}*/}
-                    {/*onDel={index => dispatch(actions.deleteTodo(index))}*/}
-                    {/*onDoingToDone={index => dispatch(actions.changeDoingToDone(index))}*/}
-                    {/*onDoingToTodo={index => dispatch(actions.changeDoingToTodo(index))}*/}
-                {/*/>*/}
-                {/*<ListDoneMemos*/}
-                    {/*todolist={todos}*/}
-                    {/*onDel={index => dispatch(actions.deleteTodo(index))}*/}
-                    {/*onDoneToDoing={index => dispatch(actions.changeDoneToDoing(index))}*/}
-                {/*/>*/}
-
             </div>
         )
     }

@@ -8,7 +8,7 @@ import { actions as todoActions } from './todo/index';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router,Route,Switch } from 'react-router-dom';
-import AllMemos from './typeTodoList/view/allMemos';
+import AllList from './typeTodoList/view/allList';
 import TodoList from './typeTodoList/view/todoList';
 import DoingList from './typeTodoList/view/doingList';
 import DoneList from './typeTodoList/view/doneList';
@@ -48,7 +48,7 @@ class App extends Component {
                 doneNumber={doneNumber}
             />
             <Switch>
-                <Route exact path="/" component={AllMemos} />
+                <Route exact path="/" component={AllList} />
                 <Route path="/todo" component={TodoList} />
                 <Route path="/doing" component={DoingList} />
                 <Route path="/done" component={DoneList} />
