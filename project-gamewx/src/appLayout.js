@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 
-import {TabBar} from 'antd-mobile';
+import {NavBar, TabBar} from 'antd-mobile';
 import './asserts/css/applayout.css'
-import { Router,Route } from 'react-router-dom';
+import {Router, Route} from 'react-router-dom';
 import history from './Common/history';
 import {typeList as TypeListView} from './ArticleModule/index';
 
@@ -12,22 +12,40 @@ class AppLayout extends Component {
         super(props);
 
         this.state = {
-            path:'/'
-        }
+            path: '/'
+        };
+
+        this.getTitle = this.getTitle.bind(this);
     }
 
     onPress(path) {
         history.push(path);
         this.setState({
-            path:path
+            path: path
         })
         console.log(this.state.path);
+    }
+
+    getTitle() {
+        switch (this.state.path) {
+            case '/':
+                return '全部文章列表';
+            case '/strategy':
+                return '游戏攻略';
+            case '/method':
+                return '战术打法';
+        }
     }
 
     render() {
         return (
             <Router history={history}>
                 <div>
+                    <NavBar>
+                        {
+                            this.getTitle()
+                        }
+                    </NavBar>
                     <Route exact path="/" render={() => (
                         <h3>请选择一个主题。</h3>
                     )}/>
