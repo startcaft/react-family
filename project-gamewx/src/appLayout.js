@@ -23,7 +23,6 @@ class AppLayout extends Component {
         this.setState({
             path: path
         })
-        console.log(this.state.path);
     }
 
     getTitle() {
@@ -41,21 +40,23 @@ class AppLayout extends Component {
         return (
             <Router history={history}>
                 <div>
-                    <NavBar>
-                        {
-                            this.getTitle()
-                        }
-                    </NavBar>
-                    <Route exact path="/" render={() => (
-                        <h3>请选择一个主题。</h3>
-                    )}/>
-                    <Route exact path="/strategy" render={() => (
-                        <h3>请选择一个strategy。</h3>
-                    )}/>
-                    <Route exact path="/method" render={() => (
-                        <h3>请选择一个method。</h3>
-                    )}/>
-                    <div className="tabbar-container">
+                    <div className="header">
+                        <NavBar mode="light">
+                            {
+                                this.getTitle()
+                            }
+                        </NavBar>
+                    </div>
+                    <div className="main">
+                        <Route exact path="/" component={TypeListView} />
+                        <Route exact path="/strategy" render={() => (
+                            <h3>请选择一个strategy。</h3>
+                        )}/>
+                        <Route exact path="/method" render={() => (
+                            <h3>请选择一个method。</h3>
+                        )}/>
+                    </div>
+                    <div className="footer">
                         <TabBar
                             unselectedTintColor='#949494'
                             tintColor='#33A3F4'
