@@ -33,29 +33,16 @@ const data = [
     },
 ];
 
-const NUM_SECTIONS = 5;
-const NUM_ROWS_PER_SECTION = 5;
+const NUM_ROWS = 20;
 let pageIndex = 0;
-
-const dataBlobs = {};
-let sectionIDs = [];
-let rowIDs = [];
-function genData(pIndex = 0) {
-    for (let i = 0; i < NUM_SECTIONS; i++) {
-        const ii = (pIndex * NUM_SECTIONS) + i;
-        const sectionName = `Section ${ii}`;
-        sectionIDs.push(sectionName);
-        dataBlobs[sectionName] = sectionName;
-        rowIDs[ii] = [];
-
-        for (let jj = 0; jj < NUM_ROWS_PER_SECTION; jj++) {
-            const rowName = `S${ii}, R${jj}`;
-            rowIDs[ii].push(rowName);
-            dataBlobs[rowName] = rowName;
-        }
+function genData(pIndex = pageIndex,pSize = NUM_ROWS) {
+    const dataBlob = {};
+    for (let i = 0; i < pSize; i++) {
+        // 根据pageIndex和pageSize确定行号
+        const ii = (pIndex * pSize) + i;
+        dataBlob[`${ii}`] = `row - ${ii}`;
     }
-    sectionIDs = [...sectionIDs];
-    rowIDs = [...rowIDs];
+    return dataBlob;
 }
 
 /**
@@ -64,34 +51,38 @@ function genData(pIndex = 0) {
 class TypeList extends React.Component{
     constructor(props) {
         super(props);
-        const getSectionData = (dataBlob, sectionID) => dataBlob[sectionID];
-        const getRowData = (dataBlob, sectionID, rowID) => dataBlob[rowID];
 
         const dataSource = new ListView.DataSource({
-            getRowData,
-            getSectionHeaderData: getSectionData,
             rowHasChanged: (row1, row2) => row1 !== row2,
-            sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
         });
 
         this.state = {
             dataSource,
             isLoading: true,
-            height: document.documentElement.clientHeight * 3 / 4,
+            height: document.documentElement.clientHeight * 3 / 4   // ListView 初始高度，随便给即可
         };
     }
 
     componentDidMount() {
         // you can scroll to the specified position
         // setTimeout(() => this.lv.scrollTo(0, 120), 800);
-        const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).parentNode.offsetTop;
+
+        // 获取 ListView 组件的DOM节点的父容器（也就是 applayout.css 中的 .main 容器的向上偏移量）
+        const lvDom = ReactDOM.findDOMNode(this.lv);
+
+        // main容器向上的偏移量
+        const mainContainerOffSetTop = lvDom.parentNode.offsetTop;
+        // main容器向下的偏移量
+        const mainContaineroffSetBottom = 50;
+        const hei = document.documentElement.clientHeight - mainContainerOffSetTop - 50;
+
         // simulate initial Ajax
         setTimeout(() => {
-            genData();
+            this.rData = genData();
             this.setState({
-                dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlobs, sectionIDs, rowIDs),
+                dataSource: this.state.dataSource.cloneWithRows(this.rData),
                 isLoading: false,
-                height: hei,
+                height: hei
             });
         }, 600);
     }
@@ -99,21 +90,24 @@ class TypeList extends React.Component{
     onEndReached = (event) => {
         // load new data
         // hasMore: from backend data, indicates whether it is the last page, here is false
+
         if (this.state.isLoading && !this.state.hasMore) {
             return;
         }
         console.log('reach end', event);
         this.setState({ isLoading: true });
         setTimeout(() => {
-            genData(++pageIndex);
+            this.rData = { ...this.rData, ...genData(++pageIndex) };
             this.setState({
-                dataSource: this.state.dataSource.cloneWithRowsAndSections(dataBlobs, sectionIDs, rowIDs),
+                dataSource: this.state.dataSource.cloneWithRows(this.rData),
                 isLoading: false,
             });
         }, 1000);
     }
 
     render(){
+        console.log(genData());
+        console.log(this.state);
         const separator = (sectionID, rowID) => (
             <div
                 key={`${sectionID}-${rowID}`}
@@ -152,17 +146,13 @@ class TypeList extends React.Component{
                 </div>
             );
         };
-
         return (
             <ListView
                 ref={el => this.lv = el}
                 dataSource={this.state.dataSource}
-                renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+                renderFooter={() => (<div style={{ padding: 15, textAlign: 'center' }}>
                     {this.state.isLoading ? 'Loading...' : 'Loaded'}
                 </div>)}
-                renderSectionHeader={sectionData => (
-                    <div>{`Task ${sectionData.split(' ')[1]}`}</div>
-                )}
                 renderBodyComponent={() => <MyBody />}
                 renderRow={row}
                 renderSeparator={separator}
@@ -170,7 +160,7 @@ class TypeList extends React.Component{
                     height: this.state.height,
                     overflow: 'auto',
                 }}
-                pageSize={4}
+                pageSize={5}
                 onScroll={() => { console.log('scroll'); }}
                 scrollRenderAheadDistance={500}
                 onEndReached={this.onEndReached}

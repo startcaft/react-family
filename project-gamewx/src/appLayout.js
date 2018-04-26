@@ -4,7 +4,7 @@ import {NavBar, TabBar} from 'antd-mobile';
 import './asserts/css/applayout.css'
 import {Router, Route} from 'react-router-dom';
 import history from './Common/history';
-import {typeList as TypeListView} from './ArticleModule/index';
+import {typeList as TypeListView,simpleListView as SimpleListView} from './ArticleModule/index';
 
 
 class AppLayout extends Component {
@@ -49,12 +49,8 @@ class AppLayout extends Component {
                     </div>
                     <div className="main">
                         <Route exact path="/" component={TypeListView} />
-                        <Route exact path="/strategy" render={() => (
-                            <h3>请选择一个strategy。</h3>
-                        )}/>
-                        <Route exact path="/method" render={() => (
-                            <h3>请选择一个method。</h3>
-                        )}/>
+                        <Route exact path="/strategy" component={SimpleListView} />
+                        <Route exact path="/method" component={TypeListView} />
                     </div>
                     <div className="footer">
                         <TabBar

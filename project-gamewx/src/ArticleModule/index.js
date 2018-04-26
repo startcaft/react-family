@@ -3,5 +3,7 @@
  */
 
 import typeList from './view/typeList';
+import simpleListView from './view/simpleListView';
+import reducer from './reducer';
 
-export {typeList};
+export {typeList,simpleListView,reducer};
