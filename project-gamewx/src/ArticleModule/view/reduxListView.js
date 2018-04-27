@@ -10,22 +10,19 @@ import ListItem from './listItem';
 import { connect } from 'react-redux';
 import { fetchArticles } from '../actions';
 
+// 当前请求页
+let pageIndex = 1;
+let pageSize = 5;
 
 class ReduxListView extends React.Component {
     constructor(props){
         super(props);
-
-        // 初始化 dataSource，指定一个 rowHasChanged 行比较函数即可
-        // const dataSource = new ListView.DataSource({
-        //     rowHasChanged:((r1,r2) => (r1 !==r2))
-        // })
         this.state = {
-            // dataSource:dataSource,
+            isLoading:true,
             height: document.documentElement.clientHeight * 3 / 4   // ListView 初始高度，随便给即可
         }
 
         this._getListViewBody = this._getListViewBody.bind(this);
-        this._getData = this._getData.bind(this);
     }
 
     // 自定义容器 ListView，主要要计算其高度，并赋值给ListView组件
@@ -35,24 +32,6 @@ class ReduxListView extends React.Component {
                 {this.props.children}
             </div>
         )
-    }
-
-    _getData(pageIndex = 0,pageSize = 10,dicItemId = 0){
-        const requestUrl = `http://localhost:8080/articles/page?page=${pageIndex}&rows=${pageSize}&dicItemId=${dicItemId}`;
-        fetch(requestUrl,{
-            method:'GET'
-        }).then((response) => {
-            if(response.status !== 200){
-                console.warn('fail request');
-            }
-            return response.json();
-        }).then((responseText) => {
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(responseText.rows)
-            })
-        }).catch((error) => {
-            console.warn(error);
-        })
     }
 
     _getListViewHeight(){
@@ -68,17 +47,27 @@ class ReduxListView extends React.Component {
     }
 
     componentDidMount() {
+        // 请求数据
+        this.props.dispatch(fetchArticles(pageIndex,pageSize));
+        this.setState({
+            height: this._getListViewHeight(),
+            isLoading:false
+        });
+    }
 
-        // simulate initial Ajax
-        setTimeout(() => {
-            this.setState({
-                height: this._getListViewHeight()
-            });
-        }, 600);
+    onEndReached = (event) => {
+        // 当 loading 完成 并且没有多余数据可以加载时候，退出执行
+        if (this.state.isLoading && !this.props.hasMore) {
+            return;
+        }
+        this.setState({ isLoading: true });
+        console.log(event);
+        // // 继续请求更多的数据
+        // this.props.dispatch(fetchArticles(++pageIndex,pageSize));
+        // this.setState({
+        //     isLoading:false,
+        // });
 
-        //this._getData();
-
-        this.props.dispatch(fetchArticles());
     }
 
     render(){
@@ -92,6 +81,9 @@ class ReduxListView extends React.Component {
             <ListView
                 ref={el => this.lv = el}
                 dataSource={this.props.dataSource}
+                renderFooter={() => (<div style={{ padding: 15, textAlign: 'center' }}>
+                    {this.state.isLoading ? 'Loading...' : 'Loaded'}
+                </div>)}
                 renderRow={getRowFunc}
                 renderBodyComponent={() => this._getListViewBody()}
                 style={{
@@ -99,20 +91,34 @@ class ReduxListView extends React.Component {
                     overflow: 'auto',
                 }}
                 pageSize={4}
+                onEndReached={this.onEndReached}
+                onEndReachedThreshold={10}
             />
         );
     }
 }
 
 const mapStateToProps = (state) => {
+    // const dataSource = new ListView.DataSource({
+    //     rowHasChanged:((r1,r2) => (r1 !==r2))
+    // })
+    const hasMore = state.articleState.hasMore;
+    const errorMsg = state.articleState.errorMsg;
     const dataSource = new ListView.DataSource({
         rowHasChanged:((r1,r2) => (r1 !==r2))
-    })
+    }).cloneWithRows(state.articleState.articles);
+
     return {
-        isLoading:state.articleState.isLoading,
-        errorMsg:state.articleState.errorMsg,
-        dataSource:dataSource.cloneWithRows(state.articleState.articles)
+        hasMore,
+        errorMsg,
+        dataSource
     }
+
+    // return {
+    //     hasMore:state.articleState.hasMore,
+    //     errorMsg:state.articleState.errorMsg,
+    //     dataSource:dataSource.cloneWithRows(state.articleState.articles)
+    // }
 }
 
 export default connect(mapStateToProps)(ReduxListView);

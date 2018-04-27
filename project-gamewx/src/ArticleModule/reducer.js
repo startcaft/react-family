@@ -17,6 +17,10 @@ const initState = {
      * 请求服务器失败的提示信息
      */
     errorMsg:'',
+    /**
+     * 是否还有更多数据
+     */
+    hasMore:false
 };
 
 export default function reducer(state=initState,action){
@@ -30,7 +34,8 @@ export default function reducer(state=initState,action){
             return {
                 ...state,
                 isLoading:false,
-                articles:action.articles
+                articles:action.articles,
+                hasMore:action.hasMore
             }
         case REQUEST_ARTILCES_FAIL:
             return {

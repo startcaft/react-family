@@ -7,23 +7,35 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ListView } from 'antd-mobile';
 import ListItem from './listItem';
+import { connect } from 'react-redux';
+import { fetchArticles } from '../actions';
 
+// 当前请求页
+let pageIndex = 1;
+let pageSize = 5;
 
 class SimpleListView extends React.Component {
     constructor(props){
         super(props);
 
-        // 初始化 dataSource，指定一个 rowHasChanged 行比较函数即可
-        const dataSource = new ListView.DataSource({
-            rowHasChanged:((r1,r2) => (r1 !==r2))
-        })
+        this.ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         this.state = {
-            dataSource:dataSource,
+            dataSource:this.ds,
             height: document.documentElement.clientHeight * 3 / 4   // ListView 初始高度，随便给即可
         }
 
+        this.listData = null; //数据源
+        this.len = null; //数据的个数
+        this.count = null; //当前数据总页数
+        this.pageSize = 5; //每次渲染的个数
+        this.page = 1; //当前页数
+
+
+        const dataSource = new ListView.DataSource({
+            rowHasChanged: (row1, row2) => row1 !== row2,
+        });
+
         this._getListViewBody = this._getListViewBody.bind(this);
-        this._getData = this._getData.bind(this);
     }
 
     // 自定义容器 ListView，主要要计算其高度，并赋值给ListView组件
@@ -35,25 +47,7 @@ class SimpleListView extends React.Component {
         )
     }
 
-    _getData(pageIndex = 0,pageSize = 10,dicItemId = 0){
-        const requestUrl = `http://localhost:8080/articles/page?page=${pageIndex}&rows=${pageSize}&dicItemId=${dicItemId}`;
-        fetch(requestUrl,{
-            method:'GET'
-        }).then((response) => {
-            if(response.status !== 200){
-                console.warn('fail request');
-            }
-            return response.json();
-        }).then((responseText) => {
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(responseText.rows)
-            })
-        }).catch((error) => {
-            console.warn(error);
-        })
-    }
-
-    componentDidMount() {
+    _getListViewHeight(){
         // 获取 ListView 组件的DOM节点的父容器（也就是 applayout.css 中的 .main 容器的向上偏移量）
         const lvDom = ReactDOM.findDOMNode(this.lv);
         // main容器向上的偏移量
@@ -62,31 +56,33 @@ class SimpleListView extends React.Component {
         const mainContaineroffSetBottom = 50;
         const hei = document.documentElement.clientHeight - mainContainerOffSetTop - mainContaineroffSetBottom;
 
-        // simulate initial Ajax
-        setTimeout(() => {
-            this.setState({
-                height: hei
-            });
-        }, 600);
+        return hei;
+    }
 
-        this._getData();
+    componentDidMount() {
+        // 请求数据
+        this.props.dispatch(fetchArticles(pageIndex,pageSize));
+        this.setState({
+            height: this._getListViewHeight(),
+            isLoading:false
+        });
+    }
+
+    onEndReached = (event) => {
+        // 当 loading 完成 并且没有多余数据可以加载时候，退出执行
+        if (this.state.isLoading && !this.props.hasMore) {
+            return;
+        }
+        this.setState({ isLoading: true });
+        // 继续请求更多的数据
+        this.props.dispatch(fetchArticles(++pageIndex,pageSize));
+        this.setState({
+            isLoading:false,
+        });
     }
 
     render(){
         const getRowFunc = (rowData, sectionID, rowID, highlightRow) => {
-            // return (
-            //     <div key={rowID} style={{ padding: '0 15px' }} onClick={() => highlightRow(sectionID,rowID)}>
-            //         <div style={{lineHeight:'50px',color:'#888',fontSize:16,borderBottom:'1px solid #F6F6F6'}}>
-            //             {rowData.articleTitle}
-            //         </div>
-            //         <div style={{ display: '-webkit-box', display: 'flex', padding: '15px 0' }}>
-            //             <img style={{ height: '64px', marginRight: '15px' }} src="http://crawl.nosdn.127.net/1a4a01fe547f722470a2019c53a11735.jpg" alt="" />
-            //             <div style={{ lineHeight: 1 }}>
-            //                 <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>{rowData.articleDesc}</div>
-            //             </div>
-            //         </div>
-            //     </div>
-            // )
             return (
                 <ListItem rowData={rowData} sectionID={sectionID} rowID={rowID} />
             )
@@ -95,7 +91,10 @@ class SimpleListView extends React.Component {
         return (
             <ListView
                 ref={el => this.lv = el}
-                dataSource={this.state.dataSource}
+                dataSource={this.props.dataSource}
+                // renderFooter={() => (<div style={{ padding: 15, textAlign: 'center' }}>
+                //     {this.state.isLoading ? 'Loading...' : 'Loaded'}
+                // </div>)}
                 renderRow={getRowFunc}
                 renderBodyComponent={() => this._getListViewBody()}
                 style={{
@@ -103,9 +102,34 @@ class SimpleListView extends React.Component {
                     overflow: 'auto',
                 }}
                 pageSize={4}
+                onEndReached={this.onEndReached}
+                onEndReachedThreshold={10}
             />
         );
     }
+}
+
+const mapStateToProps = (state) => {
+    // const dataSource = new ListView.DataSource({
+    //     rowHasChanged:((r1,r2) => (r1 !==r2))
+    // })
+    const hasMore = state.articleState.hasMore;
+    const errorMsg = state.articleState.errorMsg;
+    const dataSource = new ListView.DataSource({
+        rowHasChanged:((r1,r2) => (r1 !==r2))
+    }).cloneWithRows(state.articleState.articles);
+
+    return {
+        hasMore,
+        errorMsg,
+        dataSource
+    }
+
+    // return {
+    //     hasMore:state.articleState.hasMore,
+    //     errorMsg:state.articleState.errorMsg,
+    //     dataSource:dataSource.cloneWithRows(state.articleState.articles)
+    // }
 }
 
 export default SimpleListView;

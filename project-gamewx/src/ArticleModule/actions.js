@@ -17,12 +17,14 @@ const requestArticlestart = () => {
 /**
  * 请求 文章列表 成功，并返回数据
  * @param articles json数据
+ * @param hasMore 是否还有更多数据可以加载的标识符
  * @returns {{type: string, articles: *}}
  */
-const requestArticlesSuccess = (articles) => {
+const requestArticlesSuccess = (articles,hasMore) => {
     return {
         type:REQUEST_ARTICLES_SUCCESS,
-        articles
+        articles,
+        hasMore
     }
 }
 
@@ -38,8 +40,13 @@ const requestArticlesFail = (error) => {
     }
 }
 
-
-export const fetchArticles = (pageIndex = 0,pageSize = 10,dicItemId = 0) => (dispatch) => {
+/**
+ * 请求文章列表
+ * @param pageIndex 当前页，默认1
+ * @param pageSize 每页条目数，默认5
+ * @param dicItemId 文章类型，默认0，取所有
+ */
+export const fetchArticles = (pageIndex = 1,pageSize = 5,dicItemId = 0) => (dispatch) => {
     // 开始请求
     dispatch(requestArticlestart());
 
@@ -54,7 +61,7 @@ export const fetchArticles = (pageIndex = 0,pageSize = 10,dicItemId = 0) => (dis
         return res.json()
     }).then((res) => {
         // 请求成功
-        dispatch(requestArticlesSuccess(res.rows));
+        dispatch(requestArticlesSuccess(res.rows,res.hasMore));
     }).catch((error) => {
         dispatch(requestArticlesFail(error));
     })
